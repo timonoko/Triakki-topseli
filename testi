@@ -1,0 +1,16 @@
+while true; do
+ curl-silent 192.168.1.145/S01
+ sleep 1
+ curl-silent 192.168.1.145/S02
+ sleep 1
+ curl-silent 192.168.1.145/S05
+ sleep 1
+ curl-silent 192.168.1.145/S25
+ sleep 1
+ curl-silent  192.168.1.145/S50
+ sleep 1
+ curl-silent  192.168.1.145/S75
+ sleep 1
+ curl-silent  192.168.1.145/S99
+ sleep 1
+done
