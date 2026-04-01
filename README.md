@@ -1,4 +1,4 @@
-# Triakki-töpseli
+# Triakki-Wifi-Töpseli
 
 Kiinalainen rele paukahti. Korvasin se opto-triakilla. 
 
