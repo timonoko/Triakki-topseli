@@ -1,5 +1,4 @@
 
-print('Testing 5')
 import socket
 
 import network,time,machine
@@ -33,10 +32,13 @@ def apply_power(t):
         relayON.value(1)
         step_counter-=1
 
+SPEED=0
+        
 tim = Timer(-1)
 
 def set_speed(value):
-    global goal_speed,tim
+    global goal_speed,tim,SPEED
+    SPEED=value
     tim.init(period=11, mode=Timer.PERIODIC, callback=apply_power)
     goal_speed = round(value/5.-10)
     if goal_speed==0: goal_speed=1
@@ -46,7 +48,10 @@ def web_page():
     RS=" button2"
     if relayState==1: RS=""
     menu="""<p><a href="/ON"><button class="button%s">ON</button> </a>"""%(RS)
-    menu+="""<a href="/OFF"><button class="button button3">OFF</button> </a>"""
+    menu+="""<a href="/OFF"><button class="button button3">OFF</button> </a><p>"""
+    menu+="""<a href="/MINUS"><button class="button button4">-</button> </a>"""
+    menu+="  "+str(SPEED)+"  "
+    menu+="""<a href="/PLUS"><button class="button button4">+</button> </a>"""
     sta_if = network.WLAN(network.STA_IF)
     this_ip=sta_if.ifconfig()[0]
     html = """
@@ -59,7 +64,9 @@ def web_page():
   h1{color: #0F3376; padding: 2vh;}p{font-size: 1.5rem;}.button{display: inline-block; background-color: #ff0000; border: none; 
   border-radius: 4px; color: white; padding: 16px 40px; text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}
   .button2{background-color: #4a798a;}
-  .button3{background-color: #3f7749;}</style>
+  .button3{background-color: #3f7749;}
+  .button4{background-color: #cd0e0e;}
+   </style>
      </head>
       <body>
      <h1>TYRISTORI</h1> 
@@ -81,16 +88,18 @@ def buttoni():
            if pitka>10:
                SininenLedi.value(1)
                relayState=1
-               vauhti=3*(pitka-20)
+               vauhti=(pitka-20)
                tim.deinit()
                print('vauhti=',vauhti)
                set_speed(vauhti)
        if pitka<11:
            tim.deinit()
            if relayState==1:
+               SPEED=0
                relayState=0
                relayON.value(0)
            else:
+               SPEED=100
                relayState=1
                relayON.value(1)
        SininenLedi.value(1)
@@ -108,10 +117,12 @@ while True:
         request = str(request)
         s.settimeout(5.0)
         if request.find('/ON') == 6:
+            SPEED=100
             tim.deinit() # This kills the background timer completely
             relayState=1
             relayON.value(1)
         if request.find('/OFF') == 6:
+            SPEED=0
             relayState=0
             relayON.value(0)
             tim.deinit() # This kills the background timer completely
@@ -127,6 +138,18 @@ while True:
             tim.deinit()
             print('vauhti=',vauhti)
             set_speed(vauhti)
+        if request.find('/PLUS') == 6:
+            relayState=1
+            SPEED+=1
+            tim.deinit()
+            print('vauhti=',SPEED)
+            set_speed(SPEED)
+        if request.find('/MINUS') == 6:
+            relayState=1
+            SPEED-=1
+            tim.deinit()
+            print('vauhti=',SPEED)
+            set_speed(SPEED)
         if request.find('/LED/ON') == 6:
             SininenLedi.value(0)
         if request.find('/LED/OFF') == 6:
