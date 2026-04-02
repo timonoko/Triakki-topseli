@@ -140,13 +140,14 @@ while True:
             set_speed(vauhti)
         if request.find('/PLUS') == 6:
             relayState=1
-            SPEED+=1
+            if SPEED==0: SPEED=6
+            SPEED=int(SPEED*1.33)
             tim.deinit()
             print('vauhti=',SPEED)
             set_speed(SPEED)
         if request.find('/MINUS') == 6:
             relayState=1
-            SPEED-=1
+            SPEED=int(SPEED*0.66)
             tim.deinit()
             print('vauhti=',SPEED)
             set_speed(SPEED)
