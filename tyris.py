@@ -38,11 +38,11 @@ tim = Timer(-1)
 
 def set_speed(value):
     global goal_speed,tim,SPEED
+    print('vauhti=',SPEED)
     SPEED=value
     tim.init(period=11, mode=Timer.PERIODIC, callback=apply_power)
     goal_speed = round(value/5.-10)
     if goal_speed==0: goal_speed=1
-    print(f"Motor speed set to: {goal_speed}")
 
 def web_page():
     RS=" button2"
@@ -65,7 +65,7 @@ def web_page():
   border-radius: 4px; color: white; padding: 16px 40px; text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}
   .button2{background-color: #4a798a;}
   .button3{background-color: #3f7749;}
-  .button4{background-color: #cd0e0e;}
+  .button4{background-color: #ff4c1c;}
    </style>
      </head>
       <body>
@@ -84,14 +84,21 @@ def buttoni():
        SininenLedi.value(0)
        while BUTTON.value()==LO:
            time.sleep(0.1)
-           pitka+=1
-           if pitka>10:
-               SininenLedi.value(1)
-               relayState=1
-               vauhti=(pitka-20)
+           if pitka<120:
+               pitka+=1
+               if pitka>20:
+                   SininenLedi.value(1)
+                   relayState=1
+                   vauhti=(pitka-20)
+                   tim.deinit()
+                   print('vauhti=',vauhti)
+                   set_speed(vauhti)
+           else:
+               print('täysillä')
                tim.deinit()
-               print('vauhti=',vauhti)
-               set_speed(vauhti)
+               SPEED=100
+               relayState=1
+               relayON.value(1)
        if pitka<11:
            tim.deinit()
            if relayState==1:
@@ -136,20 +143,17 @@ while True:
             relayState=1
             vauhti=eval(request[8]+request[9])
             tim.deinit()
-            print('vauhti=',vauhti)
             set_speed(vauhti)
         if request.find('/PLUS') == 6:
             relayState=1
             if SPEED==0: SPEED=6
             SPEED=int(SPEED*1.33)
             tim.deinit()
-            print('vauhti=',SPEED)
             set_speed(SPEED)
         if request.find('/MINUS') == 6:
             relayState=1
             SPEED=int(SPEED*0.66)
             tim.deinit()
-            print('vauhti=',SPEED)
             set_speed(SPEED)
         if request.find('/LED/ON') == 6:
             SininenLedi.value(0)
